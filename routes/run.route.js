@@ -1,12 +1,25 @@
-const express = require('express');
-const runCtrl = require('./../controllers/run.controller.js');
-const run = require('../models/run.model.js');
+// จัดการเรื่องเส้นทางเพื่อกำหนด endpoint สำหรับ frontend ***
+// ในการเรียกใช้ controller เพื่อการทำงาน CRUD กับฐานข้อมูล และการอัปโหลดไฟล์
 
+// require package ที่ต้องใช้ในการกำหนดเส้นทาง (route)
+const express = require('express');
+
+// require controller เพื่อจะใช้งาน
+const runController = require('./../controllers/run.controller');
+
+// สร้าง router จาก express เพื่อจัดการเส้นทาง
 const router = express.Router();
 
-router.post('/',runCtrl.uploadRun ,runCtrl.addRun); //เพิ่มข้อมูลการวิ่ง
-router.put('/:runId', runCtrl.uploadRun, runCtrl.editRun); //แก้ไขข้อมูลการวิ่ง
-router.delete('/:runId', runCtrl.delRun); //ลบข้อมูลการวิ่ง
-router.get('/:runnerId', runCtrl.getAllRun); //ดึงข้อมูลการวิ่งทั้งหมดของนักวิ่งคนนั้นๆ
+// กำหนดเส้นทาง และการเรียกใช้ controller
+//เพิ่มข้อมูล
+router.post('/', runController.uploadRun, runController.createRun); 
+//ค้นหาข้อมูล
+router.get('/:runnerId', runController.getAllRunOfRunner);
+router.get('/only/:runId', runController.getOneOfRunner);
+//ลบข้อมูล
+router.delete('/:runId', runController.deleteRunOfRunner);
+//แก้ไข
+router.put('/:runId', runController.uploadRun, runController.updateRunOfRunner);
 
-module.exports = router; 
+// export router เพื่อนำไปใช้ที่ server.js
+module.exports = router;

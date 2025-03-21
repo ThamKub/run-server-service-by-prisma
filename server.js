@@ -1,28 +1,34 @@
-const express = require("express");
-const cors = require("cors");
-const runnerRoutes = require("./routes/runner.routes.js");
-//const runRoutes = require("./routes/run.routes.js");
- 
-require("dotenv").config();
- 
-const app = express(); // สร้าง Web Server ด้วย Express
- 
-const port = process.env.PORT || 5555; // กำหนด Port ที่ Web Server จะใช้
- 
-app.use(cors()); // ใช้งาน cors สำหรับการทำงานร่วมกับ Web Server อื่นๆ
-app.use(express.json()); // ใช้งาน express.json() สำหรับการทำงานร่วมกับ JSON
- 
-app.use("/runner", runnerRoutes); // กำหนดเส้นทางการเข้าถึง resouces ใน Web Server
-app.use("/run", runRoutes); // กำหนดเส้นทางการเข้าถึง resouces ใน Web Server
- 
-// เขียนคำสั่งเพื่อเทส เพื่อให้ client/user เข้าถึง resouces ใน Web Server
-app.get("/", (req, res) => {
-  res.js({
-    message: "Welcome to backend run server service",
-  });
-});
- 
-// คำสั่งที่ใช้เปิด Web Server เพื่อให้ client/user เข้าถึง resouces ใน Web Server
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
-});
+const express = require('express');
+const cors = require('cors');
+const runnerRouter = require('./routes/runner.route');
+const runRouter = require('./routes/run.route');
+
+require('dotenv').config();
+
+const app = express(); //สร้าง Web Server
+
+const PORT = process.env.PORT || 5555; //เรียกใช้ค่า PORT จาก .env
+
+//ใช้ตัว middleware ในการจัดการ
+//การเรียกใช้งานข้าม domain
+app.use(cors());
+//ข้อมูล JSON จาก client/user
+app.use(express.json());
+//เส้นทาง
+app.use('/runner',runnerRouter);
+app.use('/run',runRouter);
+// การเข้าถึงไฟล์ รูปภาพ
+app.use('/images/runner', express.static('images/runner'));
+app.use('/images/run', express.static('images/run'));
+
+//เขียนคำสั่งเพื่อเทส เพื่อให้ client/user เข้าถึง resource ใน server
+app.get('/', (req, res) => {
+    res.json({
+        message: `Welcome to backend run server service`
+    })
+})
+
+//คำสั่งที่ใช้เปิด server เพื่อให้ client/user เข้าถึง resource ใน server
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT} .....`);
+})
