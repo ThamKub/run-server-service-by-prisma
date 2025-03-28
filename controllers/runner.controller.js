@@ -5,6 +5,15 @@
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const { v2: cloudinary } = require('cloudinary');
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+
+cloudinary.config({
+    cloud_name: 'did8bqqoj',
+    api_key: '537651755757621',
+    api_secret: 'nQtwP7OupB7Aq7DDL0Iwwsb3Wfk'
+})
+
 
 // require package ที่ต้องใช้ในการทํางานกับฐานข้อมูล
 const { PrismaClient } = require('@prisma/client');
@@ -12,14 +21,19 @@ const prisma = new PrismaClient();
 
 //สร้างส่วนของการอัปโหลดไฟล์ด้วย multer ทำ 2 ขั้นตอน------------------------
 //1. กําหนดตําแหน่งที่จะอัปโหลดไฟล์ และชื่อไฟล์
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, 'images/runner');
+const storage = new CloudinaryStorage({
+    cloudinary,
+    params: async (req, file) => {
+        const newFileName = 'runner_' + Math.floor(Math.random() * Date.now())
+ 
+        return {
+            folder: 'images/runner', // โฟลเดอร์ใน Cloudinary
+            allowed_formats: ['jpg', 'png'], // กำหนดประเภทไฟล์
+            public_id: newFileName
+        }
     },
-    filename: (req, file, cb) => {
-        cb(null, 'runner_' + Math.floor(Math.random() * Date.now()) + path.extname(file.originalname));
-    }
 });
+
 //2. ฟังก์ชันอัปโหลดไฟล์
 exports.uploadRunner = multer({
     storage: storage,
@@ -44,7 +58,7 @@ exports.createRunner = async (req, res) => {
                 runnerName: req.body.runnerName,
                 runnerUsername: req.body.runnerUsername,
                 runnerPassword: req.body.runnerPassword,
-                runnerImage: req.file ? req.file.path.replace("images\\runner\\","") : ""
+                runnerImage: req.file ? req.file.path : "",
             }
         });
 
